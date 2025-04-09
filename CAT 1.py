@@ -8,7 +8,7 @@ from sklearn.metrics import accuracy_score, f1_score, classification_report, con
 from sklearn.model_selection import train_test_split, GridSearchCV
 import matplotlib.pylab as plt
 import seaborn as sns
-df = pd.read_csv("D:/COLLEGE/SEM 5/ML CAT/CAT 1 Breast cancer dataset.csv")
+df = pd.read_csv("CAT 1 Breast cancer dataset.csv")
 
 x = df.drop(columns=["id", "diagnosis"]) 
 

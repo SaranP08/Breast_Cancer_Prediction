@@ -1,27 +1,44 @@
 import streamlit as st
+import pandas as pd
 import joblib
-import numpy as np
+from sklearn.pipeline import Pipeline
+from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import StandardScaler
 
-# Load the trained model
-model = joblib.load("breast_cancer_model.pkl")  # Update with your actual model filename
+# Load model
+model = joblib.load("breast_cancer_model.pkl")
 
-# Streamlit UI
-st.set_page_config(page_title="Breast Cancer Prediction", layout="centered")
-st.title("🔬 Breast Cancer Prediction App")
-st.markdown("Enter the values below to predict if the tumor is malignant or benign.")
+# Define all 30 features
+feature_names = [
+    'radius_mean', 'texture_mean', 'perimeter_mean', 'area_mean', 'smoothness_mean',
+    'compactness_mean', 'concavity_mean', 'concave points_mean', 'symmetry_mean', 'fractal_dimension_mean',
+    'radius_se', 'texture_se', 'perimeter_se', 'area_se', 'smoothness_se',
+    'compactness_se', 'concavity_se', 'concave points_se', 'symmetry_se', 'fractal_dimension_se',
+    'radius_worst', 'texture_worst', 'perimeter_worst', 'area_worst', 'smoothness_worst',
+    'compactness_worst', 'concavity_worst', 'concave points_worst', 'symmetry_worst', 'fractal_dimension_worst'
+]
 
-# Example feature inputs — update these based on your model's features
-mean_radius = st.number_input("Mean Radius", value=14.0)
-mean_texture = st.number_input("Mean Texture", value=20.0)
-mean_perimeter = st.number_input("Mean Perimeter", value=90.0)
-mean_area = st.number_input("Mean Area", value=500.0)
-mean_smoothness = st.number_input("Mean Smoothness", value=0.1)
+# Preprocessing pipeline (same as training)
+preprocessing_pipeline = Pipeline([
+    ('imputer', SimpleImputer(strategy='mean')),
+    ('scaler', StandardScaler())
+])
 
-# Predict Button
+# UI title
+st.title("Breast Cancer Diagnosis Prediction")
+
+# Collect user input for all 30 features
+user_input = {}
+st.subheader("Enter all 30 features:")
+
+for feature in feature_names:
+    user_input[feature] = st.number_input(f"{feature}", value=0.0, format="%.6f")
+
+# Predict on button click
 if st.button("Predict"):
-    # Build input array — update order/length to match your training
-    input_data = np.array([[mean_radius, mean_texture, mean_perimeter, mean_area, mean_smoothness]])
-    prediction = model.predict(input_data)
+    input_df = pd.DataFrame([user_input])
+    input_processed = preprocessing_pipeline.fit_transform(input_df)  # or use transform() if using same pipeline from training
+    prediction = model.predict(input_processed)
 
-    result = "Malignant" if prediction[0] == 0 else "Benign"
-    st.success(f"Prediction: {result}")
+    diagnosis = 'Malignant' if prediction[0] == 1 else 'Benign'
+    st.success(f"The predicted diagnosis is: **{diagnosis}**")
