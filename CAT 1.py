@@ -1,4 +1,5 @@
 import pandas as pd
+import joblib
 from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.pipeline import Pipeline
@@ -75,6 +76,8 @@ best_random_forest.fit(x_train, y_train)
 best_random_forest_pred = best_random_forest.predict(x_test)
 accuracy_best_rf = accuracy_score(best_random_forest_pred, y_test)
 print("Accuracy of best random forest:", accuracy_best_rf)
+
+joblib.dump(best_random_forest, "breast_cancer_model.pkl")
 
 cm = confusion_matrix(y_test, best_random_forest_pred)
 sns.heatmap(cm, annot=True, fmt='d', cmap='Greens')
